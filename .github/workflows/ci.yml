@@ -53,7 +53,7 @@ jobs:
         run: |
           ALL_HEALTHY=0
           for i in $(seq 1 150); do
-            HEALTHY=$(docker compose -f docker/docker-compose.yml ps --format '{{.Health}}' | grep -c '^healthy$')
+            HEALTHY=$(docker compose -f docker/docker-compose.yml ps --format '{{.Health}}' | grep -c '^healthy$' || true)
             if [ "$HEALTHY" -ge 5 ]; then
               echo "all databases healthy"
               ALL_HEALTHY=1
