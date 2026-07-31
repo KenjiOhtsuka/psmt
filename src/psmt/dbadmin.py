@@ -63,7 +63,10 @@ def _create_database_sql(cfg):
     if cfg.engine == "mssql":
         return [f"CREATE DATABASE {database}"]
     if cfg.engine == "db2":
-        return [f"CREATE DATABASE {database} USING CODESET {charset}"]
+        raise OperationalError(
+            "db2 databases cannot be created over a SQL connection; "
+            "provision the database out-of-band"
+        )
     if cfg.engine == "sqlite":
         return []
     raise OperationalError(f"unknown engine: {cfg.engine}")
@@ -78,7 +81,10 @@ def _drop_database_sql(cfg):
     if cfg.engine == "mssql":
         return [f"DROP DATABASE {database}"]
     if cfg.engine == "db2":
-        return [f"DROP DATABASE {database}"]
+        raise OperationalError(
+            "db2 databases cannot be dropped over a SQL connection; "
+            "remove the database out-of-band"
+        )
     if cfg.engine == "oracle":
         return [f"DROP USER {database} CASCADE"]
     if cfg.engine == "sqlite":

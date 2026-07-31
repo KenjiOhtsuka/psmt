@@ -55,8 +55,11 @@ def test_migrate_rollback_cycle(engine, tmp_path):
     create_cfg = create_config(engine, tmp_path)
     _write_migrations(create_cfg.migrations_dir)
 
-    admin_ctx = make_context(create_cfg)
-    dbadmin.run_db_create(admin_ctx)
+    if engine == "db2":
+        admin_ctx = None
+    else:
+        admin_ctx = make_context(create_cfg)
+        dbadmin.run_db_create(admin_ctx)
     try:
         ctx = make_context(migrate_config(engine, create_cfg))
         from psmt.executor.migrate import run_migrate
@@ -72,7 +75,8 @@ def test_migrate_rollback_cycle(engine, tmp_path):
         assert run_rollback(ctx, steps=1) is True
         assert _fetch_applied(ctx) == set()
     finally:
-        dbadmin.run_db_destroy(admin_ctx)
+        if admin_ctx is not None:
+            dbadmin.run_db_destroy(admin_ctx)
 
 
 @pytest.mark.integration

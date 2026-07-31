@@ -1,5 +1,5 @@
 from .. import sqlscan
-from .base import Driver
+from .base import Driver, NO_DATABASE
 
 _PLAN_TABLE_DDL = """
 CREATE TABLE psmt_plan_table (
@@ -54,13 +54,16 @@ class Driver(Driver):
             kwargs["user"] = cfg.user
         if cfg.password:
             kwargs["password"] = cfg.password
-        dsn = database if database is not None else cfg.database
+        if database is NO_DATABASE:
+            dsn = None
+        else:
+            dsn = database if database is not None else cfg.database
         if cfg.connection_string:
             dsn = cfg.connection_string
         if dsn:
             kwargs["dsn"] = dsn
         if (cfg.user or "") == "/":
-            kwargs["auth_mode"] = oracledb.AUTH_MODE_SYSDBA
+            kwargs["mode"] = oracledb.AUTH_MODE_SYSDBA
         return oracledb.connect(**kwargs)
 
     def execute(self, conn, sql):

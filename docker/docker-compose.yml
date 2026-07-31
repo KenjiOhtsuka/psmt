@@ -74,7 +74,7 @@ services:
     environment:
       LICENSE: accept
       DB2INST1_PASSWORD: db2psmt
-      DBNAME: sample
+      DBNAME: psmt_itest
     ports:
       - "50000:50000"
     healthcheck:

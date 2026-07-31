@@ -20,6 +20,7 @@ class Driver(Driver):
                 conn_str = re.sub(r"(?i)Database\s*=\s*[^;]*;", f"Database={database};", conn_str)
             return pyodbc.connect(conn_str, autocommit=False)
         parts = ["DRIVER={ODBC Driver 18 for SQL Server}", f"SERVER={cfg.server},{cfg.port or 1433}"]
+        parts.append("TrustServerCertificate=yes")
         db = database if database is not None else cfg.database
         if db:
             parts.append(f"DATABASE={db}")
