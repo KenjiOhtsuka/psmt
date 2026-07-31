@@ -1,5 +1,7 @@
 import pytest
 
+from psmt import __version__
+
 
 class TestExitCodes:
     def test_init_creates_skeleton(self, tmp_path, monkeypatch, run_cli):
@@ -23,7 +25,7 @@ class TestExitCodes:
         with pytest.raises(SystemExit) as exc:
             run_cli("--tool-version")
         assert exc.value.code == 0
-        assert "psmt 0.1.0" in capsys.readouterr().out
+        assert f"psmt {__version__}" in capsys.readouterr().out
 
     def test_migrate_empty_success(self, sqlite_project, run_cli):
         assert run_cli("migrate") == 0
