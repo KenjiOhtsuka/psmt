@@ -91,7 +91,10 @@ def server_available(cfg):
     except DriverNotInstalledError as exc:
         return f"driver not installed: {exc}"
     try:
-        conn = driver.server_connect(cfg)
+        if cfg.engine == "db2":
+            conn = driver.connect(cfg)
+        else:
+            conn = driver.server_connect(cfg)
     except Exception as exc:
         return f"database server unavailable: {exc}"
     try:

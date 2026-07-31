@@ -78,7 +78,7 @@ services:
     ports:
       - "50000:50000"
     healthcheck:
-      test: ["CMD-SHELL", "su - db2inst1 -c 'db2 connect to sample'"]
+      test: ["CMD-SHELL", "su - db2inst1 -c 'db2 connect to psmt_itest'"]
       interval: 20s
       timeout: 20s
       retries: 30
