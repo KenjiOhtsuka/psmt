@@ -40,6 +40,7 @@ FIELD_ENV_MAP = {
     "auth_params.client_id": "PSMT_AUTH_CLIENT_ID",
     "auth_params.client_secret": "PSMT_AUTH_CLIENT_SECRET",
     "auth_params.tenant_id": "PSMT_AUTH_TENANT_ID",
+    "auth_params.trust_server_certificate": "PSMT_AUTH_TRUST_SERVER_CERTIFICATE",
     "connection_string": "PSMT_CONNECTION_STRING",
     "migrations_dir": "PSMT_DIR",
 }
@@ -129,6 +130,10 @@ def _coerce(field_name, value):
             return 0
     if field_name == "auth_params.method":
         return value
+    if field_name in ("auth_params.trust_server_certificate", "trust_server_certificate"):
+        if isinstance(value, bool):
+            return value
+        return str(value).strip().lower() in ("1", "true", "yes", "on")
     return value
 
 
@@ -206,11 +211,12 @@ def resolve_database_config(env, db_key="default", cli_dir=None, start=None, env
         ("client_id", "PSMT_AUTH_CLIENT_ID"),
         ("client_secret", "PSMT_AUTH_CLIENT_SECRET"),
         ("tenant_id", "PSMT_AUTH_TENANT_ID"),
+        ("trust_server_certificate", "PSMT_AUTH_TRUST_SERVER_CERTIFICATE"),
     ):
         if env_var in environ:
-            auth_params[field_name] = environ[env_var]
+            auth_params[field_name] = _coerce(field_name, environ[env_var])
         elif field_name not in auth_params and field_name in cfg.get("auth_params", {}):
-            auth_params[field_name] = cfg["auth_params"][field_name]
+            auth_params[field_name] = _coerce(field_name, cfg["auth_params"][field_name])
     result.auth_params = auth_params
 
     strip = cfg.get("transaction", {}).get("strip", False)

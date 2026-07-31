@@ -183,6 +183,7 @@ default:
 | `auth_params.client_id` | — | For `ActiveDirectoryServicePrincipal` |
 | `auth_params.client_secret` | — | For `ActiveDirectoryServicePrincipal` (prefer env var) |
 | `auth_params.tenant_id` | — | For `ActiveDirectoryServicePrincipal` |
+| `auth_params.trust_server_certificate` | `false` | MSSQL only: append `TrustServerCertificate=yes` to the ODBC connection string. Certificate validation stays on unless this is explicitly enabled (needed for servers with self-signed certs, e.g. local test containers). Env var: `PSMT_AUTH_TRUST_SERVER_CERTIFICATE` |
 
 Password sources for azure:
 - `ActiveDirectoryPassword` reuses the same `user` / `password` fields as SQL auth — the `password` comes from `password` / `PSMT_PASSWORD`, passed to the driver as the `PWD=` ODBC keyword.
