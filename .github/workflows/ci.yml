@@ -52,15 +52,22 @@ jobs:
         run: docker compose -f docker/docker-compose.yml up -d
       - name: Wait for databases
         run: |
+          ALL_HEALTHY=0
           for i in $(seq 1 150); do
             OUT=$(docker compose -f docker/docker-compose.yml ps --format '{{.Name}} {{.Health}}')
             if [ -n "$OUT" ] && ! echo "$OUT" | grep -qv healthy; then
               echo "all databases healthy"
+              ALL_HEALTHY=1
               break
             fi
             sleep 5
           done
           docker compose -f docker/docker-compose.yml ps
+          if [ "$ALL_HEALTHY" -ne 1 ]; then
+            echo "::error::one or more databases did not become healthy"
+            docker compose -f docker/docker-compose.yml logs
+            exit 1
+          fi
       - name: Run integration tests
         run: python -m pytest -m integration -v
       - name: Tear down databases
