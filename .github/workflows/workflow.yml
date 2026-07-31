@@ -1,27 +1,27 @@
-name: Publish to PyPI
+��name: Publish to PyPI
 
 on:
   release:
-    types: [published] # GitHubで「Release」を作�E・公開したときに自動起勁E
+    types: [published] # GitHubで「Release」を作成・公開したときに自動起動
 
 jobs:
   build-n-publish:
     name: Build and publish Python distro to PyPI
     runs-on: ubuntu-latest
 
-    # ⚠�E�ETrusted Publisher を使ぁE��めに忁E���E権限設宁E
+    # ⚠️ Trusted Publisher を使うために必須の権限設定
     permissions:
       contents: read
-      id-token: write # PyPIとのOIDC認証に忁E��E
+      id-token: write # PyPIとのOIDC認証に必要
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         persist-credentials: false
 
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
@@ -39,4 +39,4 @@ jobs:
         python -m build
 
     - name: Publish package distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v
