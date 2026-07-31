@@ -11,10 +11,12 @@ the target database.
 ## Install
 
 ```sh
-pip install -e .
-pip install -e ".[dev]"
-pip install -e ".[postgresql]"   # per-engine driver extras; .[all] for everything
+pip install psmt                 # core only (SQLite works out of the box)
+pip install "psmt[all]"          # everything, including all engine drivers
 ```
+
+Per-engine extras: `psmt[postgresql]`, `psmt[mysql]`, `psmt[mssql]`,
+`psmt[oracle]`, `psmt[db2]`. SQLite needs no extra driver.
 
 ## Usage
 
@@ -38,4 +40,5 @@ docker compose -f docker/docker-compose.yml up -d   # provision test databases
 pytest -m integration            # real-database tests (unreachable engines are skipped)
 ```
 
-See `spec/` for the full design.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, the editable
+install, and contribution guidelines. `spec/` contains the full design.
