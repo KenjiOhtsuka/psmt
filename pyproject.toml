@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psmt"
+version = "0.1.0"
+description = "Python SQL Migration Tool"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+postgresql = ["psycopg[binary]>=3.1"]
+mysql = ["PyMySQL>=1.0"]
+mssql = ["pyodbc>=5.0", "azure-identity>=1.15"]
+oracle = ["oracledb>=2.0"]
+db2 = ["ibm_db>=3.1"]
+all = [
+    "psycopg[binary]>=3.1",
+    "PyMySQL>=1.0",
+    "pyodbc>=5.0",
+    "azure-identity>=1.15",
+    "oracledb>=2.0",
+    "ibm_db>=3.1",
+]
+dev = ["pytest>=8.0", "pytest-cov>=5.0"]
+
+[project.scripts]
+psmt = "psmt.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "integration: requires a real database",
+    "postgresql: PostgreSQL integration",
+    "mysql: MySQL integration",
+    "mssql: SQL Server integration",
+    "oracle: Oracle integration",
+    "db2: DB2 integration",
+]

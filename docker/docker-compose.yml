@@ -1,0 +1,84 @@
+# Real-database test environments for the psmt integration suite.
+#
+# Bring up the databases with:
+#   docker compose -f docker/docker-compose.yml up -d
+#
+# Then run the integration tests (engines that are unreachable are skipped):
+#   python -m pytest -m integration
+#
+# Credentials match the defaults in tests/integration/helpers.py. Override via
+# PSMT_TEST_* environment variables if you run your own servers.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: psmt
+      POSTGRES_PASSWORD: psmt
+      POSTGRES_DB: psmt
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psmt -d psmt"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: psmt
+      MYSQL_USER: psmt
+      MYSQL_PASSWORD: psmt
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "PsmtTest!2026"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'PsmtTest!2026' -C -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  oracle:
+    # "psmt db create" for oracle connects as SYSDBA via user: "/".
+    image: gvenzl/oracle-free:latest
+    environment:
+      ORACLE_PASSWORD: oracle
+      APP_USER: psmt
+      APP_USER_PASSWORD: psmt
+    ports:
+      - "1521:1521"
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 20s
+      timeout: 10s
+      retries: 30
+
+  db2:
+    # Requires a Linux host (DB2 does not run on Windows containers).
+    image: ibmcom/db2:latest
+    privileged: true
+    environment:
+      LICENSE: accept
+      DB2INST1_PASSWORD: db2psmt
+      DBNAME: sample
+    ports:
+      - "50000:50000"
+    healthcheck:
+      test: ["CMD-SHELL", "su - db2inst1 -c 'db2 connect to sample'"]
+      interval: 20s
+      timeout: 20s
+      retries: 30
