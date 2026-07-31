@@ -11,11 +11,14 @@ jobs:
 
     # ⚠️ Trusted Publisher を使うために必須の権限設定
     permissions:
+      contents: read
       id-token: write # PyPIとのOIDC認証に必要
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -36,4 +39,4 @@ jobs:
         python -m build
 
     - name: Publish package distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
