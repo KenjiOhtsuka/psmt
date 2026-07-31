@@ -1,0 +1,14 @@
+# CodeRabbit configuration.
+#
+# Docstring coverage pre-merge check is disabled on purpose (issue #3).
+#
+# Policy: docstrings are written only where they add real information -
+# public API consumed by library users, and non-obvious intent (the "why").
+# They are never treated as a blanket coverage gate. LLM agents and editors
+# read the whole codebase on every context load, so a fixed coverage
+# threshold only invites filler docstrings that burn tokens without adding
+# information. Prefer a short comment where the rationale matters.
+reviews:
+  pre_merge_checks:
+    docstrings:
+      mode: off
