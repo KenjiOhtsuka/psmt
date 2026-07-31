@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   unit:
     runs-on: ubuntu-latest
@@ -13,6 +16,8 @@ jobs:
         python-version: ["3.9", "3.12"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -27,13 +32,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install ODBC Driver 18 for SQL Server
         run: |
-          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list > /dev/null
+          sudo sed -i 's|deb |deb [signed-by=/usr/share/keyrings/microsoft-prod.gpg] |g' /etc/apt/sources.list.d/mssql-release.list
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
       - name: Install
@@ -44,11 +52,15 @@ jobs:
         run: docker compose -f docker/docker-compose.yml up -d
       - name: Wait for databases
         run: |
-          for i in $(seq 1 120); do
-            docker ps --format '{{.Names}} {{.Status}}' | grep -q healthy && break
+          for i in $(seq 1 150); do
+            OUT=$(docker compose -f docker/docker-compose.yml ps --format '{{.Name}} {{.Health}}')
+            if [ -n "$OUT" ] && ! echo "$OUT" | grep -qv healthy; then
+              echo "all databases healthy"
+              break
+            fi
             sleep 5
           done
-          docker ps
+          docker compose -f docker/docker-compose.yml ps
       - name: Run integration tests
         run: python -m pytest -m integration -v
       - name: Tear down databases
