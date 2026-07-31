@@ -1,6 +1,6 @@
 from .. import sqlscan
 from ..exceptions import OperationalError
-from .base import Driver
+from .base import Driver, NO_DATABASE
 
 _DML_WORDS = {"SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE", "WITH"}
 
@@ -26,7 +26,12 @@ class Driver(Driver):
             kwargs["user"] = cfg.user
         if cfg.password:
             kwargs["password"] = cfg.password
-        kwargs["database"] = database or cfg.database
+        if database is NO_DATABASE:
+            pass
+        elif database is not None:
+            kwargs["database"] = database
+        elif cfg.database:
+            kwargs["database"] = cfg.database
         return pymysql.connect(**kwargs)
 
     def execute(self, conn, sql):

@@ -1,6 +1,13 @@
 from .. import tracker
 
 
+class _NoDatabase:
+    __slots__ = ()
+
+
+NO_DATABASE = _NoDatabase()
+
+
 class Driver:
     engine = None
     extra = None
@@ -63,9 +70,9 @@ _TABLE_EXISTS_SQL = {
 
 _SERVER_FALLBACK = {
     "postgresql": "postgres",
-    "mysql": None,
+    "mysql": NO_DATABASE,
     "sqlite": None,
     "mssql": "master",
-    "oracle": None,
+    "oracle": NO_DATABASE,
     "db2": "SAMPLE",
 }

@@ -191,3 +191,27 @@ class TestPrecedence:
             "default", "default", environ={"PSMT_TRANSACTION_STRIP": "true"}
         )
         assert cfg.transaction_strip is True
+
+    def test_trust_server_certificate_env_coerced(self, tmp_path, monkeypatch):
+        write_config(tmp_path, content="default:\n  engine: mssql\n")
+        monkeypatch.chdir(tmp_path)
+        cfg = config_mod.resolve_database_config(
+            "default",
+            "default",
+            environ={"PSMT_AUTH_TRUST_SERVER_CERTIFICATE": "true"},
+        )
+        assert cfg.auth_params["trust_server_certificate"] is True
+
+    def test_trust_server_certificate_from_config(self, tmp_path, monkeypatch):
+        write_config(
+            tmp_path,
+            content=(
+                "default:\n"
+                "  engine: mssql\n"
+                "  auth_params:\n"
+                "    trust_server_certificate: true\n"
+            ),
+        )
+        monkeypatch.chdir(tmp_path)
+        cfg = config_mod.resolve_database_config("default", "default", environ={})
+        assert cfg.auth_params["trust_server_certificate"] is True

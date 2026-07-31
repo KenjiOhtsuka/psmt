@@ -14,12 +14,15 @@ class Driver(Driver):
     def connect(self, cfg, database=None):
         import pyodbc
 
+        pyodbc.pooling = False
         if cfg.connection_string:
             conn_str = cfg.connection_string
             if database is not None:
                 conn_str = re.sub(r"(?i)Database\s*=\s*[^;]*;", f"Database={database};", conn_str)
-            return pyodbc.connect(conn_str, autocommit=False)
+            return pyodbc.connect(conn_str, autocommit=True)
         parts = ["DRIVER={ODBC Driver 18 for SQL Server}", f"SERVER={cfg.server},{cfg.port or 1433}"]
+        if cfg.auth_params.get("trust_server_certificate"):
+            parts.append("TrustServerCertificate=yes")
         db = database if database is not None else cfg.database
         if db:
             parts.append(f"DATABASE={db}")
@@ -47,7 +50,7 @@ class Driver(Driver):
                 parts.append(f"UID={cfg.user}")
             if cfg.password:
                 parts.append(f"PWD={cfg.password}")
-        return pyodbc.connect(";".join(parts) + ";", autocommit=False)
+        return pyodbc.connect(";".join(parts) + ";", autocommit=True)
 
     def _require_azure_identity(self):
         try:
